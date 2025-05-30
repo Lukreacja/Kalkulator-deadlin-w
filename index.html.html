@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Deadline'ów</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --background-color: #f5f6fa;
+            --border-radius: 8px;
+            --team-color: #9b59b6;
+            --client-color: #e67e22;
+            --success-color: #2ecc71;
+            --timeline-line: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--background-color);
+            color: var(--primary-color);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        input[type="date"], input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+        }
+
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .results {
+            margin-top: 30px;
+        }
+
+        .timeline {
+            list-style: none;
+            padding: 0;
+            position: relative;
+            margin: 40px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20px;
+            height: 100%;
+            width: 2px;
+            background: var(--timeline-line);
+        }
+
+        .timeline-item {
+            padding: 20px 20px 20px 50px;
+            margin-bottom: 20px;
+            border-radius: var(--border-radius);
+            position: relative;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .timeline-item:hover {
+            transform: translateX(5px);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--team-color);
+            border: 2px solid white;
+            box-shadow: 0 0 0 4px var(--timeline-line);
+        }
+
+        .timeline-item.team-task {
+            border-left: 4px solid var(--team-color);
+        }
+
+        .timeline-item.team-task::before {
+            background-color: var(--team-color);
+        }
+
+        .timeline-item.client-task {
+            border-left: 4px solid var(--client-color);
+        }
+
+        .timeline-item.client-task::before {
+            background-color: var(--client-color);
+        }
+
+        .timeline-item.approval-task {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .timeline-item.approval-task::before {
+            background-color: var(--success-color);
+        }
+
+        .timeline-item.publication-task {
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .timeline-item.publication-task::before {
+            background-color: var(--secondary-color);
+        }
+
+        .timeline-item .date {
+            font-weight: bold;
+            color: var(--primary-color);
+            display: block;
+            margin-top: 5px;
+        }
+
+        .timeline-item .task-name {
+            font-size: 1.1em;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .holiday-info {
+            background-color: #fff3cd !important;
+            border-left: 4px solid #ffeeba !important;
+            font-size: 0.9em;
+        }
+
+        .holiday-info::before {
+            background-color: #ffeeba !important;
+        }
+
+        .holiday-info .date {
+            text-align: right;
+            line-height: 1.4;
+        }
+
+        .task-type {
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+
+        .team-task .task-type {
+            color: var(--team-color);
+        }
+
+        .client-task .task-type {
+            color: var(--client-color);
+        }
+
+        .approval-task .task-type {
+            color: var(--success-color);
+        }
+
+        .publication-task .task-type {
+            color: var(--secondary-color);
+        }
+
+        .holidays-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .holiday-list {
+            margin-top: 15px;
+        }
+
+        .holiday-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background-color: var(--background-color);
+            margin-bottom: 5px;
+            border-radius: var(--border-radius);
+        }
+
+        .remove-holiday {
+            color: #e74c3c;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+
+        .export-button {
+            margin-top: 20px;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            display: none;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .export-button:hover {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Kalkulator Deadline'ów</h1>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <label for="publicationDate">Data publikacji (Dzień 0):</label>
+                <input type="date" id="publicationDate" required>
+            </div>
+            <button onclick="calculateDeadlines()">Oblicz terminy</button>
+        </div>
+
+        <div class="results">
+            <ul class="timeline" id="timeline"></ul>
+            <button id="exportButton" class="export-button" onclick="exportToCSV()">
+                Eksportuj do CSV
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let holidays = [];
+
+        // Funkcja do obliczania daty Wielkanocy (algorytm Meeusa/Jonesa/Butchera)
+        function getEaster(year) {
+            const a = year % 19;
+            const b = Math.floor(year / 100);
+            const c = year % 100;
+            const d = Math.floor(b / 4);
+            const e = b % 4;
+            const f = Math.floor((b + 8) / 25);
+            const g = Math.floor((b - f + 1) / 3);
+            const h = (19 * a + b - d - g + 15) % 30;
+            const i = Math.floor(c / 4);
+            const k = c % 4;
+            const l = (32 + 2 * e + 2 * i - h - k) % 7;
+            const m = Math.floor((a + 11 * h + 22 * l) / 451);
+            const month = Math.floor((h + l - 7 * m + 114) / 31);
+            const day = ((h + l - 7 * m + 114) % 31) + 1;
+            return new Date(year, month - 1, day);
+        }
+
+        // Funkcja do dodawania dni do daty
+        function addDays(date, days) {
+            const result = new Date(date);
+            result.setDate(result.getDate() + days);
+            return result;
+        }
+
+        // Funkcja do formatowania daty do formatu YYYY-MM-DD
+        function formatDateYYYYMMDD(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        // Funkcja do pobierania świąt dla danego roku
+        function getPolishHolidays(year) {
+            const holidays = [];
+            
+            // Stałe święta
+            holidays.push(`${year}-01-01`); // Nowy Rok
+            holidays.push(`${year}-01-06`); // Trzech Króli
+            holidays.push(`${year}-05-01`); // Święto Pracy
+            holidays.push(`${year}-05-03`); // Święto Konstytucji 3 Maja
+            holidays.push(`${year}-08-15`); // Wniebowzięcie NMP
+            holidays.push(`${year}-11-01`); // Wszystkich Świętych
+            holidays.push(`${year}-11-11`); // Święto Niepodległości
+            holidays.push(`${year}-12-25`); // Boże Narodzenie (pierwszy dzień)
+            holidays.push(`${year}-12-26`); // Boże Narodzenie (drugi dzień)
+
+            // Święta ruchome
+            const easter = getEaster(year);
+            holidays.push(formatDateYYYYMMDD(easter)); // Wielkanoc
+            holidays.push(formatDateYYYYMMDD(addDays(easter, 1))); // Poniedziałek Wielkanocny
+            holidays.push(formatDateYYYYMMDD(addDays(easter, 60))); // Boże Ciało
+
+            return holidays;
+        }
+
+        // Funkcja do inicjalizacji świąt
+        function initializeHolidays() {
+            const currentYear = new Date().getFullYear();
+            const nextYear = currentYear + 1;
+            
+            // Pobierz święta dla bieżącego i następnego roku
+            const currentYearHolidays = getPolishHolidays(currentYear);
+            const nextYearHolidays = getPolishHolidays(nextYear);
+            
+            // Połącz święta z obu lat
+            holidays = [...currentYearHolidays, ...nextYearHolidays];
+            
+            // Wyświetl święta w interfejsie
+            displayHolidays();
+        }
+
+        function addHoliday() {
+            const holidayDate = document.getElementById('holidayDate').value;
+            if (!holidayDate) return;
+            
+            if (!holidays.includes(holidayDate)) {
+                holidays.push(holidayDate);
+                displayHolidays();
+                calculateDeadlines();
+            }
+            
+            document.getElementById('holidayDate').value = '';
+        }
+
+        function removeHoliday(date) {
+            holidays = holidays.filter(h => h !== date);
+            displayHolidays();
+            calculateDeadlines();
+        }
+
+        function displayHolidays() {
+            const holidayList = document.getElementById('holidayList');
+            holidayList.innerHTML = '';
+            
+            holidays.sort().forEach(date => {
+                const item = document.createElement('div');
+                item.className = 'holiday-item';
+                const holidayName = getHolidayName(date);
+                item.innerHTML = `
+                    <span>${formatDate(new Date(date))}${holidayName ? ` - ${holidayName}` : ''}</span>
+                `;
+                holidayList.appendChild(item);
+            });
+        }
+
+        // Funkcja do pobierania nazwy święta
+        function getHolidayName(dateStr) {
+            const date = new Date(dateStr);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            
+            const holidayNames = {
+                '1-1': 'Nowy Rok',
+                '1-6': 'Trzech Króli',
+                '5-1': 'Święto Pracy',
+                '5-3': 'Święto Konstytucji 3 Maja',
+                '8-15': 'Wniebowzięcie NMP',
+                '11-1': 'Wszystkich Świętych',
+                '11-11': 'Święto Niepodległości',
+                '12-25': 'Boże Narodzenie (pierwszy dzień)',
+                '12-26': 'Boże Narodzenie (drugi dzień)'
+            };
+
+            const key = `${month}-${day}`;
+            
+            if (holidayNames[key]) return holidayNames[key];
+
+            // Sprawdź święta ruchome
+            const easter = getEaster(year);
+            const easterStr = formatDateYYYYMMDD(easter);
+            const easterMondayStr = formatDateYYYYMMDD(addDays(easter, 1));
+            const corpusChristiStr = formatDateYYYYMMDD(addDays(easter, 60));
+
+            if (dateStr === easterStr) return 'Wielkanoc';
+            if (dateStr === easterMondayStr) return 'Poniedziałek Wielkanocny';
+            if (dateStr === corpusChristiStr) return 'Boże Ciało';
+
+            return '';
+        }
+
+        function isWorkingDay(date) {
+            const day = date.getDay();
+            const dateString = date.toISOString().split('T')[0];
+            return day !== 0 && day !== 6 && !holidays.includes(dateString);
+        }
+
+        function subtractWorkingDays(date, days) {
+            let currentDate = new Date(date);
+            let workingDaysToSubtract = days;
+
+            while (workingDaysToSubtract > 0) {
+                currentDate.setDate(currentDate.getDate() - 1);
+                if (isWorkingDay(currentDate)) {
+                    workingDaysToSubtract--;
+                }
+            }
+
+            return currentDate;
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('pl-PL', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                weekday: 'long'
+            });
+        }
+
+        function calculateDeadlines() {
+            const publicationDate = new Date(document.getElementById('publicationDate').value);
+            if (!publicationDate || isNaN(publicationDate)) return;
+
+            const steps = [
+                { name: 'Publikacja contentu', days: 0, type: 'publication' },
+                { name: 'Akcept ostateczny', days: 1, type: 'approval' },
+                { name: 'Naniesienie poprawek (2. tura)', days: 3, type: 'team' },
+                { name: 'Zgłoszenie poprawek (2. tura)', days: 5, type: 'client' },
+                { name: 'Naniesienie poprawek (1. tura)', days: 3, type: 'team' },
+                { name: 'Zgłoszenie poprawek (1. tura)', days: 5, type: 'client' },
+                { name: 'Wysłanie Content Planu do klienta', days: 3, type: 'team' }
+            ].reverse();
+
+            const timeline = document.getElementById('timeline');
+            timeline.innerHTML = '';
+
+            let currentDate = publicationDate;
+            const relevantHolidays = new Set();
+            let holidaysShown = false;
+
+            // Pierwszy przebieg - obliczanie daty początkowej
+            let startDate = new Date(publicationDate);
+            for (const step of steps) {
+                if (step.days > 0) {
+                    startDate = subtractWorkingDays(startDate, step.days);
+                }
+            }
+
+            // Drugi przebieg - zbieranie istotnych dni wolnych
+            let tempDate = new Date(startDate);
+            while (tempDate <= publicationDate) {
+                const dateStr = formatDateYYYYMMDD(tempDate);
+                if (holidays.includes(dateStr)) {
+                    relevantHolidays.add(dateStr);
+                }
+                tempDate.setDate(tempDate.getDate() + 1);
+            }
+
+            function getTaskTypeLabel(type) {
+                switch(type) {
+                    case 'team': return 'Zadanie zespołu';
+                    case 'client': return 'Zadanie klienta';
+                    case 'approval': return 'Akceptacja';
+                    case 'publication': return 'Publikacja';
+                    default: return '';
+                }
+            }
+
+            // Trzeci przebieg - wyświetlanie kroków
+            currentDate = new Date(startDate);
+            let lastDate = null;
+
+            steps.forEach((step, index) => {
+                const item = document.createElement('li');
+                item.className = `timeline-item ${step.type}-task`;
+                
+                if (step.days === 0) {
+                    lastDate = new Date(publicationDate);
+                    currentDate = new Date(publicationDate);
+                } else {
+                    lastDate = new Date(currentDate);
+                    currentDate = addWorkingDays(currentDate, step.days);
+                }
+
+                item.innerHTML = `
+                    <div class="task-type">${getTaskTypeLabel(step.type)}</div>
+                    <div class="task-name">${step.name}</div>
+                    <span class="date">${formatDate(lastDate)}</span>
+                `;
+                timeline.appendChild(item);
+
+                // Sprawdź dni wolne między tym a następnym krokiem
+                if (index < steps.length - 1) {
+                    const nextStep = steps[index + 1];
+                    const nextDate = addWorkingDays(lastDate, nextStep.days);
+                    
+                    const holidaysInRange = Array.from(relevantHolidays)
+                        .filter(h => {
+                            const holiday = new Date(h);
+                            return holiday >= lastDate && holiday <= nextDate;
+                        })
+                        .sort();
+
+                    if (holidaysInRange.length > 0) {
+                        const holidayItem = document.createElement('li');
+                        holidayItem.className = 'timeline-item holiday-info';
+                        holidayItem.innerHTML = `
+                            <div class="task-type">Dni wolne</div>
+                            <span class="date">${holidaysInRange.map(h => 
+                                `${formatDate(new Date(h))}${getHolidayName(h) ? ` - ${getHolidayName(h)}` : ''}`
+                            ).join('<br>')}</span>
+                        `;
+                        timeline.appendChild(holidayItem);
+                    }
+                }
+            });
+
+            // Po zakończeniu obliczeń, pokaż przycisk eksportu
+            document.getElementById('exportButton').style.display = 'block';
+        }
+
+        // Dodajemy funkcję do dodawania dni roboczych
+        function addWorkingDays(date, days) {
+            let currentDate = new Date(date);
+            let workingDaysToAdd = days;
+
+            while (workingDaysToAdd > 0) {
+                currentDate.setDate(currentDate.getDate() + 1);
+                if (isWorkingDay(currentDate)) {
+                    workingDaysToAdd--;
+                }
+            }
+
+            return currentDate;
+        }
+
+        function exportToCSV() {
+            const steps = Array.from(document.querySelectorAll('.timeline-item')).map(item => {
+                const taskType = item.querySelector('.task-type').textContent;
+                const taskName = item.querySelector('.task-name')?.textContent || '';
+                const date = item.querySelector('.date').textContent;
+                
+                // Jeśli to nie jest wpis o dniach wolnych, zwróć normalny format
+                if (!item.classList.contains('holiday-info')) {
+                    return {
+                        type: taskType,
+                        name: taskName,
+                        date: date
+                    };
+                }
+                
+                // Dla dni wolnych, zwróć specjalny format
+                return {
+                    type: 'Dni wolne',
+                    name: 'Dni wolne w procesie',
+                    date: date.split('\n').join('; ')
+                };
+            });
+
+            // Przygotuj zawartość CSV
+            let csvContent = 'Typ zadania;Nazwa zadania;Data\n';
+            steps.forEach(step => {
+                csvContent += `${step.type};${step.name};${step.date}\n`;
+            });
+
+            // Dodaj BOM dla poprawnego kodowania polskich znaków w Excel
+            const BOM = '\uFEFF';
+            const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            // Przygotuj nazwę pliku z datą
+            const today = new Date();
+            const fileName = `deadlines_${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}.csv`;
+
+            link.setAttribute('href', url);
+            link.setAttribute('download', fileName);
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Inicjalizacja przy starcie
+        document.getElementById('publicationDate').valueAsDate = new Date();
+        initializeHolidays();
+        calculateDeadlines();
+    </script>
+</body>
+</html>
