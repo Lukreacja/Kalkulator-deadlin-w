@@ -253,9 +253,59 @@
         .export-button:hover {
             background-color: #27ae60;
         }
+
+        /* Popup styling */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ff4757;
+            color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            text-align: center;
+            font-size: 24px;
+            animation: shake 0.5s ease-in-out infinite;
+        }
+
+        .popup img {
+            max-width: 200px;
+            margin: 20px auto;
+            display: block;
+            border-radius: var(--border-radius);
+        }
+
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 999;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            25% { transform: translate(-50%, -50%) rotate(-5deg); }
+            75% { transform: translate(-50%, -50%) rotate(5deg); }
+        }
     </style>
 </head>
 <body>
+    <div class="popup-overlay" id="popupOverlay"></div>
+    <div class="popup" id="warningPopup">
+        JESTEŚ W DUPIE! 🤡
+        <img src="ceo" alt="CEO Reaction">
+    </div>
+    <audio id="circusMusic" loop>
+        <source src="audio" type="audio/mpeg">
+    </audio>
     <div class="container">
         <h1>Kalkulator Deadline'ów</h1>
         
@@ -501,6 +551,18 @@
             currentDate = new Date(startDate);
             let lastDate = null;
 
+            // Sprawdź, czy data wysłania content planu jest w przeszłości
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Reset time to start of day
+            const contentPlanDate = new Date(startDate);
+            contentPlanDate.setHours(0, 0, 0, 0);
+
+            if (contentPlanDate < today) {
+                showWarningPopup();
+            } else {
+                hideWarningPopup();
+            }
+
             steps.forEach((step, index) => {
                 const item = document.createElement('li');
                 item.className = `timeline-item ${step.type}-task`;
@@ -610,6 +672,21 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        }
+
+        function showWarningPopup() {
+            document.getElementById('popupOverlay').style.display = 'block';
+            document.getElementById('warningPopup').style.display = 'block';
+            const music = document.getElementById('circusMusic');
+            music.play().catch(e => console.log('Autoplay prevented:', e));
+        }
+
+        function hideWarningPopup() {
+            document.getElementById('popupOverlay').style.display = 'none';
+            document.getElementById('warningPopup').style.display = 'none';
+            const music = document.getElementById('circusMusic');
+            music.pause();
+            music.currentTime = 0;
         }
 
         // Inicjalizacja przy starcie
