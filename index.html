@@ -261,7 +261,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: #ff4757;
+            background-color: #000000;
             color: white;
             padding: 30px;
             border-radius: var(--border-radius);
@@ -272,11 +272,28 @@
             animation: shake 0.5s ease-in-out infinite;
         }
 
-        .popup img {
-            max-width: 200px;
-            margin: 20px auto;
-            display: block;
-            border-radius: var(--border-radius);
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            color: #ff4757;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-button:hover {
+            transform: scale(1.1);
+            background: #ffecec;
         }
 
         .popup-overlay {
@@ -288,6 +305,15 @@
             bottom: 0;
             background-color: rgba(0,0,0,0.7);
             z-index: 999;
+            cursor: pointer;
+        }
+
+        .popup img {
+            max-width: 400px;
+            width: 100%;
+            margin: 20px auto;
+            display: block;
+            border-radius: var(--border-radius);
         }
 
         @keyframes shake {
@@ -300,11 +326,12 @@
 <body>
     <div class="popup-overlay" id="popupOverlay"></div>
     <div class="popup" id="warningPopup">
+        <button class="close-button" onclick="hideWarningPopup()">✕</button>
         JESTEŚ W DUPIE! 🤡
-        <img src="ceo" alt="CEO Reaction">
+        <img src="ceo.gif" alt="CEO Reaction">
     </div>
     <audio id="circusMusic" loop>
-        <source src="audio" type="audio/mpeg">
+        <source src="audio.mp3" type="audio/mpeg">
     </audio>
     <div class="container">
         <h1>Kalkulator Deadline'ów</h1>
@@ -688,6 +715,9 @@
             music.pause();
             music.currentTime = 0;
         }
+
+        // Dodaj obsługę kliknięcia w overlay
+        document.getElementById('popupOverlay').addEventListener('click', hideWarningPopup);
 
         // Inicjalizacja przy starcie
         document.getElementById('publicationDate').valueAsDate = new Date();
